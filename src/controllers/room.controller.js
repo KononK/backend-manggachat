@@ -1,6 +1,7 @@
 const helpers = require('../helpers')
 const Room = require('../models/room.model')
 const Member = require('../models/member.model')
+const Message = require('../models/message.model')
 const { v4: uuidv4 } = require('uuid');
 
 const room = {
@@ -9,7 +10,7 @@ const room = {
     Room.all().then(response => {
       helpers.response(res, 200, response, helpers.status.found)
     }).catch(err => {
-      helpers.response(res, err.statusCode, null, err, true)
+      helpers.response(res, 400, null, err, true)
     })
   },
   addPublicRoom: (req, res) => {
@@ -28,16 +29,23 @@ const room = {
           idUser: id,
           status: 1
         }
-        Member.addMember(dataMember).then(responseMember => {
+        Member.addMember(dataMember).then(async responseMember => {
+          const createGroup = {
+            message: `Create Group ${name}`,
+            type: 6,
+            idRoom: responseRoom.idRoom,
+            idUser: id
+          }
+          await Message.sendMessage(createGroup)
           helpers.response(res, 200, responseRoom, helpers.status.insert)
         }).catch(err => {
-          helpers.response(res, err.statusCode, null, err, true)
+          helpers.response(res, 400, null, err, true)
         })
       }).catch(err => {
-        helpers.response(res, err.statusCode, null, err, true)
+        helpers.response(res, 400, null, err, true)
       })
     }).catch(err => {
-      helpers.response(res, err.statusCode, null, err, true)
+      helpers.response(res, 400, null, err, true)
     })
   },
   detailRoom: (req, res) => {
@@ -46,7 +54,7 @@ const room = {
       response = response[0]
       helpers.response(res, 200, response, helpers.status.found)
     }).catch(err => {
-      helpers.response(res, err.statusCode, null, err, true)
+      helpers.response(res, 400, null, err, true)
     })
   },
   updateRoom: (req, res) => {
@@ -55,7 +63,21 @@ const room = {
     Room.updateRoom({name: name}, id).then(response => {
       helpers.response(res, 200, response, helpers.status.update)
     }).catch(err => {
-      helpers.response(res, err.statusCode, null, err, true)
+      helpers.response(res, 400, null, err, true)
+    })
+  },
+  changeNotif: (req, res) => {
+    const idRoom = req.params.id
+    const id = req.userId
+    Member.getDetailNotif(idRoom, id).then(response => {
+      response = response[0]
+      Member.updateMember({notification: !response.notification}, idRoom, id).then(responseUpdate => {
+        helpers.response(res, 200, responseUpdate, helpers.status.update)
+      }).catch(err => {
+        helpers.response(res, 400, null, err, true)
+      })
+    }).catch(err => {
+      helpers.response(res, 400, null, err, true)
     })
   },
   inviteUser: (req, res) => {
@@ -68,7 +90,7 @@ const room = {
     Member.addMember(dataMember).then(responseMember => {
       helpers.response(res, 200, responseMember, helpers.status.insert)
     }).catch(err => {
-      helpers.response(res, err.statusCode, null, err, true)
+      helpers.response(res, 400, null, err, true)
     })
   },
   myRoom: (req, res) => {
@@ -77,7 +99,7 @@ const room = {
       response
       helpers.response(res, 200, response, helpers.status.found)
     }).catch(err => {
-      helpers.response(res, err.statusCode, null, err, true)
+      helpers.response(res, 400, null, err, true)
     })
   },
   

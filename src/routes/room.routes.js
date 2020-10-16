@@ -15,6 +15,7 @@ router
   // .get('/room-image/:id', verifyToken, roomController.getRoomImage)
   // .get('/room-document/:id', verifyToken, roomController.getRoomDocument)
   .get('/:id', verifyToken, roomController.detailRoom)
+  .patch('/change-notif/:id', verifyToken, roomController.changeNotif)
   .patch('/:id', verifyToken, ROOM_UPDATE_PUBLIC, roomController.updateRoom)
   // .delete('/:id', verifyToken, roomController.deleteRoom)
 

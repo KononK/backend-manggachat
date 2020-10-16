@@ -10,7 +10,7 @@ const room = {
   },
   getMyRoom: (id) => {
     return queryHelper(`
-      SELECT members.*, a.name, a.type, a.description, b.message, b.createdAt, users.name as userName
+      SELECT members.*, a.name, a.type, a.description, b.message, b.createdAt, b.deletedAt, users.name as userName, users.id as sender, a.idSender, a.idReceiver
       FROM members 
       INNER JOIN (
         SELECT * FROM messages
@@ -19,8 +19,8 @@ const room = {
       INNER JOIN rooms as a
         ON members.idRoom = a.idRoom 
       INNER JOIN users
-        ON users.id = members.idUser
-      WHERE members.idUser = ? GROUP BY b.idRoom ORDER BY b.id DESC`, id)
+        ON users.id = b.idUser
+      WHERE members.idUser = ?  GROUP BY b.idRoom ORDER BY b.id DESC`, id)
   },
   getRoomByIdRoom: (idRoom) => {
     return queryHelper('SELECT rooms.*, messages.message FROM rooms INNER JOIN messages ON rooms.idRoom = messages.idRoom WHERE rooms.idRoom = ? ORDER BY messages.id DESC', idRoom)

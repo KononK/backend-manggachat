@@ -24,7 +24,7 @@ app.use('/uploads', express.static('./uploads'))
 io.on('connection', (socket) => {
   console.log('User connect')
 
-  socket.on('tesjoin', (data) => {
+  socket.on('join-room', (data) => {
     data.map(room => {
       console.log(`Join to ${room}`)
       socket.join(room)
@@ -40,8 +40,8 @@ io.on('connection', (socket) => {
     socket.join(data.room)
   })
 
-  socket.on('sendFriend', data => {
-    io.emit('notifSendFriend', data)
+  socket.on('addFriend', data => {
+    io.emit('notifAddFriend', data)
   })
   socket.on('inviteFriend', async data => {
     // let myRoom = await Room.findById(data.room, {
@@ -63,10 +63,10 @@ io.on('connection', (socket) => {
   socket.on('accFriend', data => {
     io.emit('notifAccFriend', data)
   })
-  socket.on('refuseFriend', data => {
-    io.emit('notifRefuseFriend', data)
+  socket.on('rejectFriend', data => {
+    io.emit('notifRejectFriend', data)
   })
-  socket.on('handleDelete', data => {
+  socket.on('deleteFriend', data => {
     io.emit('notifDeleteFriend', data)
   })
   socket.on('typing', data => {
@@ -78,6 +78,7 @@ io.on('connection', (socket) => {
   })
 
   socket.on('sendMessage', async (data) => {
+    console.log(data)
     // socket.broadcast.emit('broadcast', `${data.senderId}: ${data.message}`);
     let notif = ''
     if (data.type === 1) {
@@ -85,7 +86,12 @@ io.on('connection', (socket) => {
     } else {
       notif = `<b>${data.roomName}</b>:(${data.name}) ${data.message}`
     }
-    socket.broadcast.to(data.room).emit('notifPesan', {notif: notif, data:data})
+    if(data.sendWhat === 10){
+      console.log('10')
+    }else{
+
+      socket.broadcast.to(data.room).emit('notifPesan', {notif: notif, data:data})
+    }
     io.to(data.room).emit('sendMessageHandle', {
       ...data
     })
