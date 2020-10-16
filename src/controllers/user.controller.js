@@ -7,9 +7,10 @@ const user = {
     console.log(id)
     User.all(id).then(response => {
       const result = response
-      res.send(result)
+      helpers.response(res, 200, result, helpers.status.found)
+
     }).catch(err => {
-      console.log(err)
+      helpers.response(res, err.statusCode, [], err, true)
     })
   },
   detailUser: (req, res) => {
@@ -33,12 +34,10 @@ const user = {
     })
   },
   updateStatusOnline: (req, res) => {
-    const id = req.userId
-    const status = req.query.status
-    console.log(id)
-    if(!status) return helpers.response(res, 400, [], 'Status required', true)
-    if(status !== '1' && status !== '0') return helpers.response(res, 400, [], 'Status invalid', true)
-    User.updateUser({statusOnline: status}, id).then(response => {
+    const {status} = req.body
+    const idUser = req.params.id
+    if(Number(status) !== 1 && Number(status) !== 0) return helpers.response(res, 400, [], 'Status invalid', true)
+    User.updateUser({statusOnline: status}, idUser).then(response => {
       helpers.response(res, 200, response, helpers.status.update)
     }).catch(err => {
       helpers.response(res, err.statusCode, [], err, true)
@@ -46,7 +45,7 @@ const user = {
   },
   updateLocation: (req, res) => {
     // "{\"lang\":232,\"lat\":122}"
-    const id = req.userId
+    const id = req.params.id
     const { location } = req.body
     if(!location) return helpers.response(res, 400, [], 'Location required', true)
     User.updateUser({location}, id).then(response => {
@@ -56,12 +55,13 @@ const user = {
     })
   },
   updateUser: (req, res) => {
-    const { name, phoneNumber, username } = req.body
+    const { name, phoneNumber, username, bio } = req.body
     const id = req.params.id
     if (req.uploadErrorMessage) return helpers.response(res, 400, [], req.uploadErrorMessage, true)
     const newDataUser = {
       name,
       phoneNumber,
+      bio,
       username: username.toLowerCase()
     }
     if (req.file) {

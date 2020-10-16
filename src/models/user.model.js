@@ -4,9 +4,14 @@ const queryHelper = require('../helpers/query')
 const user = {
   all: (id) => {
     return queryHelper(`
-      SELECT
-      id, name, email, username, location, image, phoneNumber, bio, statusAccount, statusOnline, createdAt, updatedAt
-      FROM users WHERE id != ?`, id)
+      SELECT a.* FROM users as a 
+      LEFT JOIN (
+        SELECT * FROM friends
+        WHERE idUser = ?
+      ) as b ON a.id = b.idFriend
+      WHERE a.id != ? AND b.id IS NULL
+    `,
+    [id, id])
   },
   getAllUser: (id, order, limit, offset, search, orderBy) => {
     return queryHelper(

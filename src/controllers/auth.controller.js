@@ -26,7 +26,7 @@ const authController = {
               },
             )
             const newResponse = {
-              id: user.id,
+              idUser: user.id,
               token
             }
             try{
@@ -62,7 +62,8 @@ const authController = {
         id: uuidv4(),
         name,
         email: email.toLowerCase(),
-        password: hash
+        password: hash,
+        bio: `Bio Saya Belum Diubah :D`
       }
       User.signup(newUser).then((response) => {
         const token = jwt.sign(

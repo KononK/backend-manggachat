@@ -9,10 +9,21 @@ const room = {
     return queryHelper('SELECT * FROM rooms WHERE id = ?', id)
   },
   getMyRoom: (id) => {
-    return queryHelper('SELECT * FROM members WHERE idUser = ?', id)
+    return queryHelper(`
+      SELECT members.*, a.name, a.type, a.description, b.message, b.createdAt, users.name as userName
+      FROM members 
+      INNER JOIN (
+        SELECT * FROM messages
+        GROUP BY id DESC
+      ) b ON members.idRoom = b.idRoom
+      INNER JOIN rooms as a
+        ON members.idRoom = a.idRoom 
+      INNER JOIN users
+        ON users.id = members.idUser
+      WHERE members.idUser = ? GROUP BY b.idRoom ORDER BY b.id DESC`, id)
   },
   getRoomByIdRoom: (idRoom) => {
-    return queryHelper('SELECT * FROM rooms WHERE idRoom = ?', idRoom)
+    return queryHelper('SELECT rooms.*, messages.message FROM rooms INNER JOIN messages ON rooms.idRoom = messages.idRoom WHERE rooms.idRoom = ? ORDER BY messages.id DESC', idRoom)
   },
   addRoomPublic: (data) => {
     return queryHelper('INSERT INTO rooms SET ?', data)

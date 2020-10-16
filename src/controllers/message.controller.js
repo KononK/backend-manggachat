@@ -4,10 +4,41 @@ const Room = require('../models/room.model')
 const Member = require('../models/member.model')
 const { v4: uuidv4 } = require('uuid');
 const { response } = require('express')
-
+let totalData
 const message = {
   allMessage: (req, res) => {
     res.send('ok')
+  },
+  messageByRoom: (req, res) => {
+    const id = req.params.id
+    if(!id) return helpers.response(res, 400, null, 'Id room required', true)
+
+    const limit = Number(req.query.limit) || 10
+    const page = !req.query.page ? 1 : req.query.page
+    const offset = (Number(page) === 0 ? 1 : page - 1) * limit
+    const search = req.query.search || null
+    const orderBy = req.query.orderby || 'id'
+    const order = req.query.order || 'DESC'
+
+    if (search) {
+      Message.getTotalSearchMessageByRoom(id, search).then(response => {
+        totalData = response[0].totalFound
+      }).catch(err => console.log(err))
+    } else {
+      Message.getTotalMessageByRoom(id).then(response => {
+        totalData = response[0].totalFound
+      }).catch(err => console.log(err))
+    }
+
+    Message.getMessageByRoom(id, order, limit, offset, search, orderBy).then(response => {
+      const newResponse = response
+      const count = newResponse.length
+      const total = totalData
+      const links = helpers.links(limit, page, total, count)
+      helpers.response(res, 200, newResponse, helpers.status.found, false, links)
+    }).catch(err  => {
+      helpers.response(res, err.statusCode, null, err, true)
+    })
   },
   sendMessage: async (req, res) => {
     const id = req.userId

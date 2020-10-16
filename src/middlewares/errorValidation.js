@@ -138,7 +138,7 @@ const errorValidation = {
     })
   },
   USER_UPDATE_PROFILE: (req, res, next) => {
-    const { name, phoneNumber, username } = req.body
+    const { name, phoneNumber, username, bio } = req.body
     const newCheck = [
       {
         name: 'Name',
@@ -153,6 +153,11 @@ const errorValidation = {
       {
         name: 'Username',
         value: username,
+        type: 'string',
+      },
+      {
+        name: 'Bio',
+        value: bio,
         type: 'string',
       }
     ]

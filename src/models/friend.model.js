@@ -6,7 +6,7 @@ const friend = {
     return queryHelper('SELECT * FROM friends')
   },
   myFriend: (id) => {
-    return queryHelper('SELECT * FROM friends WHERE idUser = ?', id)
+    return queryHelper('SELECT friends.*, users.name as friendName, users.image, users.statusOnline FROM friends INNER JOIN users ON friends.idFriend = users.id WHERE idUser = ?', id)
   },
   addFriend: (data) => {
     return queryHelper('INSERT INTO friends SET ?', data)
