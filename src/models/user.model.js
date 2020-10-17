@@ -9,7 +9,7 @@ const user = {
         SELECT * FROM friends
         WHERE idUser = ?
       ) as b ON a.id = b.idFriend
-      WHERE a.id != ? AND b.id IS NULL
+      WHERE a.id != ? AND a.statusOnline = 1 AND b.id IS NULL
     `,
     [id, id])
   },

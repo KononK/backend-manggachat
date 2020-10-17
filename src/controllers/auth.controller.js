@@ -210,6 +210,7 @@ const authController = {
     User.getUserByEmail(email)
       .then((response) => {
         const resultUser = response[0]
+        if(resultUser.statusAccount !== 1) return helpers.response(res, 400, [],  'Your account has not been activated, please check your email to activate', true)
         Token.checkTokenExist(resultUser.id, 2).then((resToken) => {
           if(resToken.length > 0){
             return helpers.response(res, 400, [],  'The link to change the password has been sent to your email.', true)
