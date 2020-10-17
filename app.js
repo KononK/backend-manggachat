@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 6000
 app.use(
   bodyParser.urlencoded({
     extended: false,
-  }),
+  })
 )
 
 app.use(bodyParser.json())
