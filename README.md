@@ -1,7 +1,7 @@
 # Mangga Chat API
 ![GitHub repo size in bytes](https://img.shields.io/github/repo-size/joonacode/backend-manggachat)
 
-This API is for Mangga Chat App.
+This API is for Mangga Chat App
 
 ## Build with
 * [Node.js](https://nodejs.org/en/)
