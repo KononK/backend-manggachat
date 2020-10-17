@@ -7,7 +7,16 @@ const { v4: uuidv4 } = require('uuid');
 const room = {
 
   allRoom: (req, res) => {
+    console.log('all')
     Room.all().then(response => {
+      helpers.response(res, 200, response, helpers.status.found)
+    }).catch(err => {
+      helpers.response(res, 400, null, err, true)
+    })
+  },
+  findRoom: (req, res) => {
+    const name = req.query.name
+    Room.findRoom(name).then(response => {
       helpers.response(res, 200, response, helpers.status.found)
     }).catch(err => {
       helpers.response(res, 400, null, err, true)

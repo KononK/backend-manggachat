@@ -78,7 +78,6 @@ io.on('connection', (socket) => {
   })
 
   socket.on('sendMessage', async (data) => {
-    console.log(data)
     // socket.broadcast.emit('broadcast', `${data.senderId}: ${data.message}`);
     let notif = ''
     if (data.type === 1) {

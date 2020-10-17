@@ -37,7 +37,7 @@ const message = {
       const links = helpers.links(limit, page, total, count)
       helpers.response(res, 200, newResponse, helpers.status.found, false, links)
     }).catch(err  => {
-      helpers.response(res, err.statusCode, null, err, true)
+      helpers.response(res, 400, null, err, true)
     })
   },
   sendMessage: async (req, res) => {
@@ -127,7 +127,7 @@ const message = {
         helpers.response(res, 400, null, err, true)
       })
     }).catch(err => {
-      helpers.response(res, err.statusCode, null, err, true)
+      helpers.response(res, 400, null, err, true)
     })
   }
 }

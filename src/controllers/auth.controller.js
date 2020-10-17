@@ -1,4 +1,8 @@
 const User = require('../models/user.model')
+const Member = require('../models/member.model')
+const Friend = require('../models/friend.model')
+const Message = require('../models/message.model')
+const Room = require('../models/room.model')
 const helpers = require('../helpers/index')
 const bcrypt = require('bcrypt')
 const saltRounds = 12
@@ -47,7 +51,7 @@ const authController = {
       })
       .catch((error) => {
         console.log('Sini')
-        helpers.response(res, error.statusCode, null, 'Wrong email or password', true)
+        helpers.response(res, 400, null, 'Wrong email or password', true)
       })
   },
   register: (req, res) => {
@@ -100,14 +104,14 @@ const authController = {
   activateAccount: (req, res) => {
     const token = req.body.token
     if (!token) return helpers.response(res, 400, null, 'No token provided', true)
-    Token.findToken(token).then(response => {
+    Token.findToken(token).then(async response => {
       const {
         token,
         idUser,
         type
       } = response[0]
       if (type !== 1) return helpers.response(res, 400, null, 'Wrong token', true)
-      jwt.verify(token, process.env.PRIVATE_KEY, function (err, decoded) {
+      jwt.verify(token, process.env.PRIVATE_KEY, async function (err, decoded) {
         if (err) {
           if (err.name === 'JsonWebTokenError') {
             return helpers.response(res, 401, null, 'Token invalid', true)
@@ -123,19 +127,75 @@ const authController = {
             return helpers.response(res, 401, null, err, true)
           }
         } else {
-          Token.activateAccount(idUser)
-          .then(responseActivate => {
-            Token.deleteToken(token).then(deleteResponse => console.log('token deleted'))
-            helpers.response(
-              res,
-              200,
-              responseActivate,
-              'Account successfully activate'
-            )
-          }).catch(err => {
-            helpers.response(res, 400, null, err, true)
-
-          })
+          try{
+            await Token.activateAccount(idUser)
+            await Token.deleteToken(token)
+            const responseRoomGlobal = await Room.findRoom('Public')
+            const dataGlobal = responseRoomGlobal[0]
+            console.log(responseRoomGlobal)
+            const dataMember = {
+              idRoom: dataGlobal.idRoom,
+              idUser: idUser,
+              status: 2
+            }
+            await Member.addMember(dataMember)
+            const joinMessage = {
+              message: `Join Room`,
+              type: 7,
+              idRoom: dataGlobal.idRoom,
+              idUser: idUser
+            }
+            await Message.sendMessage(joinMessage)
+            const data1 = {
+              idUser: process.env.USER_ROOT,
+              idFriend: idUser,
+              idSender: process.env.USER_ROOT,
+              status: 1
+            }
+            const data2 = {
+              idUser: idUser,
+              idFriend: process.env.USER_ROOT,
+              idSender: process.env.USER_ROOT,
+              status: 1
+            }
+            await Friend.addFriend(data1)
+            await Friend.addFriend(data2)
+            const roomName = Math.random().toString(36).substring(7);
+            const dataRoomPrivate = {
+              idRoom: uuidv4(),
+              name: roomName,
+              idSender: process.env.USER_ROOT,
+              idReceiver: idUser,
+              type: 1
+            }
+            const response = await Room.addRoomPublic(dataRoomPrivate)
+            console.log(response)
+            const responseRoom = await Room.getRoomById(response.insertId)
+            const detailRoom = responseRoom[0]
+            const dataMember1 = {
+              idRoom: detailRoom.idRoom,
+              idUser: process.env.USER_ROOT,
+              status: 1
+            }
+            const dataMember2 = {
+              idRoom: detailRoom.idRoom,
+              idUser: idUser,
+              status: 1
+            }
+            await Member.addMember(dataMember1)
+            await Member.addMember(dataMember2)
+            const messageAcc = {
+              message: `Hai..👋️, Selamat datang di 🍋️Mangga Chat jika kamu menemukan bug atau ada saran fitur tambahan bisa share di chat sini ya 😁️`,
+              type: 1,
+              idRoom: detailRoom.idRoom,
+              idUser: process.env.USER_ROOT
+            }
+            await Message.sendMessage(messageAcc)
+            helpers.response( res, 200, ['ok'], 'Account successfully activate')
+          }catch(error) {
+            console.log(error)
+            return helpers.response(res, 400, null, error, true)
+          }
         }
       })
     }).catch(err => {
@@ -151,16 +211,15 @@ const authController = {
       .then((response) => {
         const resultUser = response[0]
         Token.checkTokenExist(resultUser.id, 2).then((resToken) => {
-            helpers.response(res, 400, [],  'The link to change the password has been sent to your email.', true)
-          })
-          .catch((errToken) => {
+          if(resToken.length > 0){
+            return helpers.response(res, 400, [],  'The link to change the password has been sent to your email.', true)
+          }else{
             const token = jwt.sign({
-                data: email,
-              },
-              process.env.PRIVATE_KEY, {
-                expiresIn: '3h',
-              },
-            )
+              data: email,
+            },
+            process.env.PRIVATE_KEY, {
+              expiresIn: '3h',
+            })
             const mailMessage = `${process.env.BASE_URL_RESET_PASSWORD}?token=${token}`
             helpers.transporter(mailMessage, email, 'Reset Password Mangga Chat', 'reset', () => {
               User.getUserByEmail(email)
@@ -181,13 +240,17 @@ const authController = {
                   )
                 })
                 .catch((err) => {
-                  helpers.response(res, err.statusCode, [], err, true)
+                  helpers.response(res, 400, [], err, true)
                 })
-            })
+              })
+            }
+          })
+          .catch((errToken) => {
+            helpers.response(res, 400, [], errToken, true)
           })
       })
       .catch((err) => {
-        helpers.response(res, err.statusCode, [], err, true)
+        helpers.response(res, 400, [], err, true)
       })
   },
   verifyResetPassword: (req, res) => {
@@ -251,7 +314,7 @@ const authController = {
                   Token.deleteToken(token).then(deleteResponse => console.log('token deleted'))
                   helpers.response(res, 200, ['ok'], 'Password updated')
                 }).catch(err => {
-                  helpers.response(res, err.statusCode, [], err, true)
+                  helpers.response(res, 400, [], err, true)
                 })
             })
           })

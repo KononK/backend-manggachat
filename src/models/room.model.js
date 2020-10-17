@@ -8,6 +8,9 @@ const room = {
   getRoomById: (id) => {
     return queryHelper('SELECT * FROM rooms WHERE id = ?', id)
   },
+  findRoom: (name) => {
+    return queryHelper('SELECT * FROM rooms WHERE type = 2 AND name LIKE ?', [`%${name}%`])
+  },
   getMyRoom: (id) => {
     return queryHelper(`
       SELECT members.*, a.name, a.type, a.description, b.message, b.createdAt, b.deletedAt, users.name as userName, users.id as sender, a.idSender, a.idReceiver

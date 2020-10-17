@@ -10,7 +10,7 @@ const user = {
       helpers.response(res, 200, result, helpers.status.found)
 
     }).catch(err => {
-      helpers.response(res, err.statusCode, [], err, true)
+      helpers.response(res, 400, [], err, true)
     })
   },
   detailUser: (req, res) => {
@@ -20,7 +20,7 @@ const user = {
       delete response.password
       helpers.response(res, 200, response, helpers.status.found)
     }).catch(err => {
-      helpers.response(res, err.statusCode, [], err, true)
+      helpers.response(res, 400, [], err, true)
     })
   },
   profile: (req, res) => {
@@ -30,7 +30,7 @@ const user = {
       delete response.password
       helpers.response(res, 200, response, helpers.status.found)
     }).catch(err => {
-      helpers.response(res, err.statusCode, [], err, true)
+      helpers.response(res, 400, [], err, true)
     })
   },
   updateStatusOnline: (req, res) => {
@@ -40,7 +40,7 @@ const user = {
     User.updateUser({statusOnline: status}, idUser).then(response => {
       helpers.response(res, 200, response, helpers.status.update)
     }).catch(err => {
-      helpers.response(res, err.statusCode, [], err, true)
+      helpers.response(res, 400, [], err, true)
     })
   },
   updateLocation: (req, res) => {
@@ -51,7 +51,7 @@ const user = {
     User.updateUser({location}, id).then(response => {
       helpers.response(res, 200, response, helpers.status.update)
     }).catch(err => {
-      helpers.response(res, err.statusCode, [], err, true)
+      helpers.response(res, 400, [], err, true)
     })
   },
   updateUser: (req, res) => {
@@ -71,7 +71,7 @@ const user = {
       .then(response => {
         helpers.response(res, 200, [], helpers.status.update)
       }).catch((err) => {
-        helpers.response(res, err.statusCode, [], err, true)
+        helpers.response(res, 400, [], err, true)
       })
   }
 }

@@ -7,6 +7,7 @@ const { ROOM_ADD_PUBLIC, ROOM_UPDATE_PUBLIC, ROOM_INVITE_USER } = require('../mi
 router
   .get('/', roomController.allRoom)
   .get('/my-room', verifyToken, roomController.myRoom)
+  .get('/my-find', roomController.findRoom)
   // .get('/my-room-summary', verifyToken, roomController.getMyRoomSummary)
   // .get('/find-room/:id', verifyToken, roomController.findRoom)
   .post('/public-room', verifyToken, ROOM_ADD_PUBLIC, roomController.addPublicRoom)

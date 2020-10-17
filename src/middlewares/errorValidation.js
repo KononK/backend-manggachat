@@ -41,7 +41,7 @@ const errorValidation = {
           const resEmail = await User.checkEmailExist(email.toLowerCase())
           isEmailExist = resEmail[0].totalFound
         } catch (error) {
-          return helpers.response(res, error.statusCode, null, error, true)
+          return helpers.response(res, 400, null, error, true)
         }
         if (isEmailExist > 0) {
           return helpers.response(res, 400, null, 'Email already exist', true)
@@ -99,7 +99,7 @@ const errorValidation = {
           const resEmail = await User.checkEmailExist(email.toLowerCase())
           isEmailExist = resEmail[0].totalFound
         } catch (error) {
-          return helpers.response(res, error.statusCode, null, error, true)
+          return helpers.response(res, 400, null, error, true)
         }
         if (isEmailExist === 0) {
           return helpers.response(res, 400, null, 'Email not found', true)
@@ -197,7 +197,7 @@ const errorValidation = {
             next()
           }
         }).catch(err => {
-          return helpers.response(res, err.statusCode, [], err, true)
+          return helpers.response(res, 400, [], err, true)
         })
       }
     })
@@ -218,7 +218,7 @@ const errorValidation = {
         const resRooom = await Room.checkRoomName(name)
         isRoomNameExist = resRooom[0].totalFound
       } catch (error) {
-        return helpers.response(res, error.statusCode, null, error, true)
+        return helpers.response(res, 400, null, error, true)
       }
       if (isRoomNameExist > 0) {
         return helpers.response(res, 400, null, 'Room name already exist', true)
@@ -249,7 +249,7 @@ const errorValidation = {
             const resRooom = await Room.checkRoomName(name)
             isRoomNameExist = resRooom[0].totalFound
           } catch (error) {
-            return helpers.response(res, error.statusCode, null, error, true)
+            return helpers.response(res, 400, null, error, true)
           }
           if (isRoomNameExist > 0) {
             return helpers.response(res, 400, null, 'Room name already exist', true)
@@ -258,7 +258,7 @@ const errorValidation = {
           }
         }
       }).catch(err => {
-        return helpers.response(res, err.statusCode, null, err, true)
+        return helpers.response(res, 400, null, err, true)
       })
       
     })
@@ -295,7 +295,7 @@ const errorValidation = {
                 isUserExist = resMember[0].totalFound
               } catch (error) {
                 console.log('sini')
-                return helpers.response(res, error.statusCode, null, error, true)
+                return helpers.response(res, 400, null, error, true)
               }
               if (isUserExist > 0) {
                 return helpers.response(res, 400, null, 'The user has already joined this room', true)
@@ -306,7 +306,7 @@ const errorValidation = {
           })
         }
       }).catch(err => {
-        return helpers.response(res, err.statusCode, null, 'User Not Found', true)
+        return helpers.response(res, 400, null, 'User Not Found', true)
       })
       
     })
@@ -355,7 +355,7 @@ const errorValidation = {
             }
           }
         }).catch(err => {
-          return helpers.response(res, err.statusCode, null, 'User Not Found', true)
+          return helpers.response(res, 400, null, 'User Not Found', true)
         })
       }
     })
@@ -410,7 +410,7 @@ const errorValidation = {
             }
           }
         }).catch(err => {
-          return helpers.response(res, err.statusCode, null, 'User Not Found', true)
+          return helpers.response(res, 400, null, 'User Not Found', true)
         })
       }
     })
@@ -465,7 +465,7 @@ const errorValidation = {
             }
           }
         }).catch(err => {
-          return helpers.response(res, err.statusCode, null, 'User Not Found', true)
+          return helpers.response(res, 400, null, 'User Not Found', true)
         })
       }
     })
@@ -518,7 +518,7 @@ const errorValidation = {
             }
           }
         }).catch(err => {
-          return helpers.response(res, err.statusCode, null, 'User Not Found', true)
+          return helpers.response(res, 400, null, 'User Not Found', true)
         })
       }
     })
